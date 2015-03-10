@@ -22,14 +22,16 @@ import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.ServiceLoader;
 
 import Constants.Constants;
 
 public class LoginActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,ResultCallback<People.LoadPeopleResult> {
-private static final String TAG = "Login Activity class";
-private HashMap profileInfo  = new HashMap();
-private PersonBuffer circles;
+    private static final String TAG = "Login Activity class";
+    private HashMap profileInfo  = new HashMap();
+    private PersonBuffer circles;
     /* Request code used to invoke sign in user interactions. */
     private static final int RC_SIGN_IN = 0;
 
@@ -89,24 +91,23 @@ private PersonBuffer circles;
             mGoogleApiClient.disconnect();
         }
     }
-//    @Override
+    //    @Override
   /*  protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }*/
-public void onConnectionFailed(ConnectionResult result) {
-    if (!mIntentInProgress) {
-        // Store the ConnectionResult so that we can use it later when the user clicks
-        // 'sign-in'.
-        mConnectionResult = result;
+    public void onConnectionFailed(ConnectionResult result) {
+        if (!mIntentInProgress) {
+            // Store the ConnectionResult so that we can use it later when the user clicks
+            // 'sign-in'.
+            mConnectionResult = result;
 
-        if (mSignInClicked) {
-            // The user has already clicked 'sign-in' so we attempt to resolve all
-            // errors until the user is signed in, or they cancel.
-            resolveSignInError();
+            if (mSignInClicked) {
+                // The user has already clicked 'sign-in' so we attempt to resolve all
+                // errors until the user is signed in, or they cancel.
+                resolveSignInError();
+            }
         }
     }
-}
 
     public void onConnected(Bundle connectionHint) {
         // We've resolved any connection errors.  mGoogleApiClient can be used to
@@ -117,15 +118,16 @@ public void onConnectionFailed(ConnectionResult result) {
             String personName = currentPerson.getDisplayName();
             Person.Image personPhoto = currentPerson.getImage();
             String personGooglePlusProfile = currentPerson.getUrl();
-
+           String organization = ((Person.Organizations) currentPerson.getOrganizations().get(0)).getName();
             profileInfo.put(Constants.CURRENT_PERSON,currentPerson);
             profileInfo.put(Constants.PERSON_NAME,personName);
             profileInfo.put(Constants.PERSON_PHOTO,personPhoto);
             profileInfo.put(Constants.PERSON_GOOGLE_PLUS_PROFILE,personGooglePlusProfile);
+            profileInfo.put(Constants.ORGANIZATION,organization);
         }
 
         Plus.PeopleApi.loadVisible(mGoogleApiClient, null)
-               .setResultCallback(this);
+                .setResultCallback(this);
        /* Intent intent =  new Intent(this,LoggedInActivity.class);
         intent.putExtra(Constants.CONNECTED, Constants.YES);
         startActivity(intent); */

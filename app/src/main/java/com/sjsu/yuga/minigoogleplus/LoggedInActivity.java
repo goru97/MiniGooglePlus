@@ -36,7 +36,7 @@ public class LoggedInActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       Intent i =  getIntent();
+        Intent i =  getIntent();
         profileInfo = (HashMap) i.getSerializableExtra(Constants.PROFILE_INFO);
         setContentView(R.layout.activity_logged_in);
         if (savedInstanceState == null) {
@@ -73,23 +73,18 @@ public class LoggedInActivity extends ActionBarActivity {
      * A placeholder fragment containing a simple view.
      */
  /*   public static class PlaceholderFragment extends Fragment {
-
         public PlaceholderFragment() {
         }
-
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_logged_in, container, false);
-
             return rootView;
         }
     } */
 
-public HashMap getProfileInfo(){
-    return profileInfo;
-}
+    public HashMap getProfileInfo(){
+        return profileInfo;
+    }
 
 }
-
-

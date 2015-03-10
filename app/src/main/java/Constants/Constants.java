@@ -12,4 +12,5 @@ public interface Constants {
     String PERSON_GOOGLE_PLUS_PROFILE = "personGooglePlusProfile";
     String PROFILE_INFO = "profileInfo";
     String CIRCLES = "circles";
+    String ORGANIZATION ="organization";
 }
