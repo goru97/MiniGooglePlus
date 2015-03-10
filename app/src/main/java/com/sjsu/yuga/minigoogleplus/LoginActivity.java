@@ -13,12 +13,23 @@ import android.view.View;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
+import com.google.android.gms.plus.model.people.PersonBuffer;
+
+import java.util.HashMap;
+
+import Constants.Constants;
 
 public class LoginActivity extends Activity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,ResultCallback<People.LoadPeopleResult> {
+private static final String TAG = "Login Activity class";
+private HashMap profileInfo  = new HashMap();
+private PersonBuffer circles;
     /* Request code used to invoke sign in user interactions. */
     private static final int RC_SIGN_IN = 0;
 
@@ -57,7 +68,7 @@ public class LoginActivity extends Activity implements
             public void onClick(View v){
                 Log.d("","Clicked");
                 if (!mGoogleApiClient.isConnecting()) {
-                    Log.d("","Problem might be here");
+
                     mSignInClicked = true;
                     resolveSignInError();
                 }
@@ -100,7 +111,25 @@ public void onConnectionFailed(ConnectionResult result) {
     public void onConnected(Bundle connectionHint) {
         // We've resolved any connection errors.  mGoogleApiClient can be used to
         // access Google APIs on behalf of the user.
-        Log.d("","Connected");
+        Log.d(TAG,"Connected");
+        if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
+            Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+            String personName = currentPerson.getDisplayName();
+            Person.Image personPhoto = currentPerson.getImage();
+            String personGooglePlusProfile = currentPerson.getUrl();
+
+            profileInfo.put(Constants.CURRENT_PERSON,currentPerson);
+            profileInfo.put(Constants.PERSON_NAME,personName);
+            profileInfo.put(Constants.PERSON_PHOTO,personPhoto);
+            profileInfo.put(Constants.PERSON_GOOGLE_PLUS_PROFILE,personGooglePlusProfile);
+        }
+
+        Plus.PeopleApi.loadVisible(mGoogleApiClient, null)
+               .setResultCallback(this);
+       /* Intent intent =  new Intent(this,LoggedInActivity.class);
+        intent.putExtra(Constants.CONNECTED, Constants.YES);
+        startActivity(intent); */
+
     }
 
     protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
@@ -115,7 +144,7 @@ public void onConnectionFailed(ConnectionResult result) {
 
 
     private void resolveSignInError() {
-        Log.d("","Problem might be here 1");
+
         if (mConnectionResult.hasResolution()) {
             try {
                 mIntentInProgress = true;
@@ -130,6 +159,29 @@ public void onConnectionFailed(ConnectionResult result) {
         }
     }
 
+    @Override
+    public void onResult(People.LoadPeopleResult peopleData) {
+        if (peopleData.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
+            PersonBuffer personBuffer = peopleData.getPersonBuffer();
+            circles = personBuffer;
+            try {
+                int count = personBuffer.getCount();
+                for (int i = 0; i < count; i++) {
+                    Log.d(TAG, "Display name: " + personBuffer.get(i).getDisplayName());
+                }
+            } finally {
+                personBuffer.close();
+            }
+        } else {
+            Log.e(TAG, "Error requesting visible circles: " + peopleData.getStatus());
+        }
+
+        //Start New Activity from here
+        Intent intent =  new Intent(this,LoggedInActivity.class);
+        intent.putExtra(Constants.CONNECTED, Constants.YES);
+        intent.putExtra(Constants.PROFILE_INFO, profileInfo);
+        startActivity(intent);
+    }
     public void onConnectionSuspended(int cause) {
         mGoogleApiClient.connect();
     }
