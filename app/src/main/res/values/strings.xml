@@ -1,6 +1,13 @@
 <resources>
-    <string name="app_name">MiniGooglePlus</string>
+    <string-array name="titles_array">
+        <item>My Profile</item>
+        <item>My Circles</item>
+        <item>Sign Out</item>
+    </string-array>
 
+    <string name="app_name">MiniGooglePlus</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
     <string name="hello_world">Hello world!</string>
     <string name="name">Name</string>
     <string name="action_settings">Settings</string>

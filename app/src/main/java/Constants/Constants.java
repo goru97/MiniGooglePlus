@@ -13,4 +13,6 @@ public interface Constants {
     String PROFILE_INFO = "profileInfo";
     String CIRCLES = "circles";
     String ORGANIZATION ="organization";
+    String ABOUT_ME = "aboutMe";
+    String LOGIN_ACTIVITY = "loginActivity";
 }

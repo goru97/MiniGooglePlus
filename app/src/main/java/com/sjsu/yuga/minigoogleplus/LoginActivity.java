@@ -3,6 +3,7 @@ package com.sjsu.yuga.minigoogleplus;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +22,7 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -119,11 +121,13 @@ public class LoginActivity extends Activity implements
             Person.Image personPhoto = currentPerson.getImage();
             String personGooglePlusProfile = currentPerson.getUrl();
            String organization = ((Person.Organizations) currentPerson.getOrganizations().get(0)).getName();
+            String aboutMe = currentPerson.getAboutMe();
             profileInfo.put(Constants.CURRENT_PERSON,currentPerson);
             profileInfo.put(Constants.PERSON_NAME,personName);
             profileInfo.put(Constants.PERSON_PHOTO,personPhoto);
             profileInfo.put(Constants.PERSON_GOOGLE_PLUS_PROFILE,personGooglePlusProfile);
             profileInfo.put(Constants.ORGANIZATION,organization);
+            profileInfo.put(Constants.ABOUT_ME,aboutMe);
         }
 
         Plus.PeopleApi.loadVisible(mGoogleApiClient, null)
@@ -203,12 +207,20 @@ public class LoginActivity extends Activity implements
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+      /*  if (id == R.id.action_settings) {
             return true;
         }
+        */
 
         return super.onOptionsItemSelected(item);
     }
 
+    public void signOutFromGplus() {
+        if (mGoogleApiClient.isConnected()) {
+            Plus.AccountApi.clearDefaultAccount(this.mGoogleApiClient);
+            mGoogleApiClient.disconnect();
+          //  mGoogleApiClient.connect();
 
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.sjsu.yuga.minigoogleplus;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -7,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +33,7 @@ public class PeopleFragment extends Fragment {
     ProgressDialog pDialog;
     TextView profile_name;
     TextView organization;
+    TextView aboutMe;
     public PeopleFragment() {
     }
 
@@ -43,6 +44,7 @@ public class PeopleFragment extends Fragment {
         img = (ImageView)rootView.findViewById(R.id.profile_image);
         profile_name = (TextView)rootView.findViewById(R.id.profile_name);
         organization = (TextView)rootView.findViewById(R.id.organization);
+        aboutMe = (TextView)rootView.findViewById(R.id.aboutMe);
         setProfile();
         new LoadImage().execute(((Person.Image)(((LoggedInActivity)getActivity()).getProfileInfo()).get(Constants.PERSON_PHOTO)).getUrl());
         return rootView;
@@ -51,8 +53,8 @@ public class PeopleFragment extends Fragment {
     private void setProfile(){
         LoggedInActivity loggedInActivity = (LoggedInActivity)getActivity();
         profile_name.setText((String) (loggedInActivity.getProfileInfo()).get(Constants.PERSON_NAME));
-        profile_name.setTextSize(15);
         organization.setText((String) (loggedInActivity.getProfileInfo()).get(Constants.ORGANIZATION));
+        aboutMe.setText((String) (loggedInActivity.getProfileInfo()).get(Constants.ABOUT_ME));
     }
     private class LoadImage extends AsyncTask<String, String, Bitmap> {
         @Override
