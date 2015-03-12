@@ -3,7 +3,6 @@ package com.sjsu.yuga.minigoogleplus;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,12 +10,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
@@ -34,9 +35,11 @@ public class LoginActivity extends Activity implements
     private static final String TAG = "Login Activity class";
     private HashMap profileInfo  = new HashMap();
     private PersonBuffer circles;
+
+
     /* Request code used to invoke sign in user interactions. */
     private static final int RC_SIGN_IN = 0;
-
+   private static final int RC_SIGN_OUT = 1;
     /* Client used to interact with Google APIs. */
     private GoogleApiClient mGoogleApiClient;
 
@@ -122,6 +125,7 @@ public class LoginActivity extends Activity implements
             String personGooglePlusProfile = currentPerson.getUrl();
            String organization = ((Person.Organizations) currentPerson.getOrganizations().get(0)).getName();
             String aboutMe = currentPerson.getAboutMe();
+            Log.d(TAG,currentPerson+"");
             profileInfo.put(Constants.CURRENT_PERSON,currentPerson);
             profileInfo.put(Constants.PERSON_NAME,personName);
             profileInfo.put(Constants.PERSON_PHOTO,personPhoto);
@@ -139,12 +143,21 @@ public class LoginActivity extends Activity implements
     }
 
     protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
+      Log.d(TAG,requestCode+"--request code");
         if (requestCode == RC_SIGN_IN) {
             mIntentInProgress = false;
 
             if (!mGoogleApiClient.isConnecting()) {
                 mGoogleApiClient.connect();
             }
+        }
+        else if(requestCode == RC_SIGN_OUT){
+            Boolean isLoggedIn = intent.getBooleanExtra(Constants.IS_LOGGED_IN, false);
+            Log.d(this.getLocalClassName(), "Is Logged In: " + isLoggedIn);
+
+            if(!isLoggedIn)
+              //  signOutFromGplus();
+            revokeGplusAccess();
         }
     }
 
@@ -186,7 +199,7 @@ public class LoginActivity extends Activity implements
         Intent intent =  new Intent(this,LoggedInActivity.class);
         intent.putExtra(Constants.CONNECTED, Constants.YES);
         intent.putExtra(Constants.PROFILE_INFO, profileInfo);
-        startActivity(intent);
+        startActivityForResult(intent, RC_SIGN_OUT);
     }
     public void onConnectionSuspended(int cause) {
         mGoogleApiClient.connect();
@@ -216,11 +229,31 @@ public class LoginActivity extends Activity implements
     }
 
     public void signOutFromGplus() {
+        Log.d("","Signing Out!");
         if (mGoogleApiClient.isConnected()) {
             Plus.AccountApi.clearDefaultAccount(this.mGoogleApiClient);
             mGoogleApiClient.disconnect();
-          //  mGoogleApiClient.connect();
+            mGoogleApiClient.connect();
 
+        }
+    }
+
+    /**
+     * Revoking access from google
+     * */
+    private void revokeGplusAccess() {
+        if (mGoogleApiClient.isConnected()) {
+            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+            Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient)
+                    .setResultCallback(new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(Status arg0) {
+                            Log.e(TAG, "User access revoked!");
+                            mGoogleApiClient.connect();
+
+                        }
+
+                    });
         }
     }
 }

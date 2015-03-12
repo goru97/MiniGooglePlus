@@ -121,8 +121,11 @@ public class LoggedInActivity extends Activity {
         toast.show();
     }
         else if(position == 2){
+        Log.d("","Hello position 2!");
 //loginActivity.signOutFromGplus();
-        ((LoginActivity)getParent()).signOutFromGplus();
+        Intent data = new Intent();
+        data.putExtra(Constants.IS_LOGGED_IN, false);
+        setResult(RESULT_OK, data);
         finish();
     }
         // update selected item and title, then close the drawer

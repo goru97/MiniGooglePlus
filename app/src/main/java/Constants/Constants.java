@@ -15,4 +15,5 @@ public interface Constants {
     String ORGANIZATION ="organization";
     String ABOUT_ME = "aboutMe";
     String LOGIN_ACTIVITY = "loginActivity";
+    String IS_LOGGED_IN = "is_Logged_In";
 }
